@@ -144,7 +144,7 @@ module Axlsx
     # @return [SimpleTypedList]
     # @see Worksheet#add_row
     def rows
-      @rows ||= SimpleTypedList.new Row
+      @rows ||= SimpleTypedList.new [Row, LazyRow]
     end
 
     # returns the sheet data as columns
@@ -398,7 +398,12 @@ module Axlsx
     # @option options [Array] widths each member of the widths array will affect how auto_fit behavies.
     # @option options [Float] height the row's height (in points)
     def add_row(values=[], options={})
-      row = Row.new(self, values, options)
+      row = if options.delete(:lazy)
+              LazyRow.new(self, values, options)
+            else
+              Row.new(self, values, options)
+            end
+
       update_column_info row, options.delete(:widths)
       yield row if block_given?
       row
