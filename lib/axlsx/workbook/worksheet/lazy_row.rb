@@ -17,19 +17,6 @@ module Axlsx
       }
     end
 
-    class CellWrapper
-      include Singleton
-
-      def data(row, value = nil, options = {})
-        # each time we create a new one
-        @cell = Cell.new(row, value, options)
-      end
-
-      def to_xml_string(r_index, c_index, str = '')
-        @cell.to_xml_string(r_index, c_index, str)
-      end
-    end
-
     # A list of serializable attributes.
     serializable_attributes []
 
@@ -56,13 +43,16 @@ module Axlsx
           @options[:type] = types.is_a?(Array) ? types[index] : types if types
           @options[:formula_value] = formula_values[index] if formula_values.is_a?(Array)
 
-          cell = CellWrapper.instance
-          cell.data(self, value, @options)
-
-          cell.to_xml_string(r_index, c_index, tmp)
+          data = [self, value, @options]
+          cell_to_xml_string(data, r_index, c_index, tmp)
         end
         str << tmp
       end
+    end
+
+    def cell_to_xml_string(data, r_index, c_index, str = '')
+      cell = Cell.new(*data)
+      cell.to_xml_string(r_index, c_index, str)
     end
   end
 end
