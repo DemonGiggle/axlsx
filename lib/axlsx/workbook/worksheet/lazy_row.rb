@@ -39,9 +39,9 @@ module Axlsx
         tmp = '' # time / memory tradeoff, lots of calls to rubyzip costs more
                  # time..
         @values.each_with_index do |value, c_index|
-          @options[:style] = style.is_a?(Array) ? style[index] : style if style
-          @options[:type] = types.is_a?(Array) ? types[index] : types if types
-          @options[:formula_value] = formula_values[index] if formula_values.is_a?(Array)
+          @options[:style] = style.is_a?(Array) ? style[c_index] : style if style
+          @options[:type] = types.is_a?(Array) ? types[c_index] : types if types
+          @options[:formula_value] = formula_values[c_index] if formula_values.is_a?(Array)
 
           data = [self, value, @options]
           cell_to_xml_string(data, r_index, c_index, tmp)
