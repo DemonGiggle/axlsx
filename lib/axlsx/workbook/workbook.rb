@@ -34,6 +34,7 @@ require 'axlsx/workbook/worksheet/sheet_protection.rb'
 require 'axlsx/workbook/worksheet/sheet_pr.rb'
 require 'axlsx/workbook/worksheet/dimension.rb'
 require 'axlsx/workbook/worksheet/sheet_data.rb'
+require 'axlsx/workbook/worksheet/lazy_sheet_data.rb'
 require 'axlsx/workbook/worksheet/worksheet_drawing.rb'
 require 'axlsx/workbook/worksheet/worksheet_comments.rb'
 require 'axlsx/workbook/worksheet/worksheet_hyperlink'
@@ -46,6 +47,7 @@ require 'axlsx/workbook/workbook_views'
 
 
 require 'axlsx/workbook/worksheet/worksheet.rb'
+require 'axlsx/workbook/worksheet/lazy_worksheet.rb'
 require 'axlsx/workbook/shared_strings_table.rb'
 require 'axlsx/workbook/defined_name.rb'
 require 'axlsx/workbook/defined_names.rb'
@@ -262,7 +264,11 @@ require 'axlsx/workbook/worksheet/selection.rb'
     # @option options [String] name The name of the worksheet
     # @option options [Hash] page_margins The page margins for the worksheet
     def insert_worksheet(index=0, options={})
-      worksheet = Worksheet.new(self, options)
+      worksheet = if options[:lazy]
+                    LazyWorksheet.new(self, options)
+                  else
+                    Worksheet.new(self, options)
+                  end
       @worksheets.delete_at(@worksheets.size - 1)
       @worksheets.insert(index, worksheet)
       yield worksheet if block_given?
@@ -276,7 +282,11 @@ require 'axlsx/workbook/worksheet/selection.rb'
     # @option options [Hash] page_margins The page margins for the worksheet.
     # @see Worksheet#initialize
     def add_worksheet(options={})
-      worksheet = Worksheet.new(self, options)
+      worksheet = if options[:lazy]
+                    LazyWorksheet.new(self, options)
+                  else
+                    Worksheet.new(self, options)
+                  end
       yield worksheet if block_given?
       worksheet
     end

@@ -46,15 +46,6 @@ module Axlsx
       @name ||= "Sheet" + (index+1).to_s
     end
 
-    # lazy initialization
-    def lazy
-      @lazy ||= false
-    end
-
-    def lazy=(v)
-      @lazy = v
-    end
-
     # Specifies the visible state of this sheet. Allowed states are
     # :visible, :hidden or :very_hidden. The default value is :visible.
     #
@@ -153,7 +144,7 @@ module Axlsx
     # @return [SimpleTypedList]
     # @see Worksheet#add_row
     def rows
-      @rows ||= SimpleTypedList.new [Row, LazyRow]
+      @rows ||= SimpleTypedList.new Row
     end
 
     # returns the sheet data as columns
@@ -407,12 +398,7 @@ module Axlsx
     # @option options [Array] widths each member of the widths array will affect how auto_fit behavies.
     # @option options [Float] height the row's height (in points)
     def add_row(values=[], options={})
-      row = if lazy
-              LazyRow.new(self, values, options)
-            else
-              Row.new(self, values, options)
-            end
-
+      row = Row.new(self, values, options)
       update_column_info row, options.delete(:widths)
       yield row if block_given?
       row
