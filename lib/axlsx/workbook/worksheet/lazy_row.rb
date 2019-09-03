@@ -74,8 +74,6 @@ module Axlsx
 
     def cell_to_xml_string(data, r_index, c_index, str = '')
       CellWrapper.instance.to_xml_string(data, r_index, c_index, str)
-      #cell = Cell.new(*data)
-      #cell.to_xml_string(r_index, c_index, str)
     end
   end
 end
