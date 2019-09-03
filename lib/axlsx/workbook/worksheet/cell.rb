@@ -31,6 +31,10 @@ module Axlsx
     # @option options [Number] formula_value The value to cache for a formula cell.
     # @option options [Symbol] scheme must be one of :none, major, :minor
     def initialize(row, value = nil, options = {})
+      initialize_data(row, value, options)
+    end
+
+    def initialize_data(row, value = nil, options = {})
       @row = row
       # Do not use instance vars if not needed to use less RAM
       # And do not call parse_options on frequently used options
