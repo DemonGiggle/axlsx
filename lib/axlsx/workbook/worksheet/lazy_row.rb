@@ -24,7 +24,6 @@ module Axlsx
       @worksheet = worksheet
       @values = values
       @options = options
-      @worksheet.rows << self
     end
 
     # Serializes the row
