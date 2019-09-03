@@ -6,6 +6,25 @@ module Axlsx
     include SerializedAttributes
     include Accessors
 
+    class CellWrapper
+      include Singleton
+
+      def initialize
+        @mutex = Mutex.new
+      end
+
+      def to_xml_string(data, r_index, c_index, str)
+        @mutex.synchronize do
+          if @cell == nil
+            @cell = Cell.new(*data)
+          else
+            @cell.initialize_data(*data)
+          end
+          @cell.to_xml_string(r_index, c_index, str)
+        end
+      end
+    end
+
     ####
     # mimic Array
     # :: but we store nothing
@@ -21,6 +40,10 @@ module Axlsx
     serializable_attributes []
 
     def initialize(worksheet, values=[], options={})
+      initialize_data(worksheet, values, options)
+    end
+
+    def initialize_data(worksheet, values=[], options={})
       @worksheet = worksheet
       @values = values
       @options = options
@@ -50,8 +73,7 @@ module Axlsx
     end
 
     def cell_to_xml_string(data, r_index, c_index, str = '')
-      cell = Cell.new(*data)
-      cell.to_xml_string(r_index, c_index, str)
+      CellWrapper.instance.to_xml_string(data, r_index, c_index, str)
     end
   end
 end
