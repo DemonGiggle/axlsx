@@ -40,8 +40,9 @@ module Axlsx
       # And do not call parse_options on frequently used options
       # to get less GC cycles
       type = options.delete(:type) || cell_type_from_value(value)
-      self.type = type unless type == :string
-
+      if self.type != type
+        self.type = type
+      end
 
       val = options.delete(:style)
       self.style = val unless val.nil? || val == 0
