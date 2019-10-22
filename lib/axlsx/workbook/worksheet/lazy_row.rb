@@ -7,21 +7,13 @@ module Axlsx
     include Accessors
 
     class CellWrapper
-      include Singleton
-
-      def initialize
-        @mutex = Mutex.new
-      end
-
       def to_xml_string(data, r_index, c_index, str)
-        @mutex.synchronize do
-          if @cell == nil
-            @cell = Cell.new(*data)
-          else
-            @cell.initialize_data(*data)
-          end
-          @cell.to_xml_string(r_index, c_index, str)
+        if @cell == nil
+          @cell = Cell.new(*data)
+        else
+          @cell.initialize_data(*data)
         end
+        @cell.to_xml_string(r_index, c_index, str)
       end
     end
 
@@ -57,6 +49,7 @@ module Axlsx
       DataTypeValidator.validate :array_to_cells, Array, @values
       types, style, formula_values = @options.delete(:types), @options.delete(:style), @options.delete(:formula_values)
 
+      cell = CellWrapper.new
       serialized_tag('row', str, :r => r_index + 1) do
         tmp = '' # time / memory tradeoff, lots of calls to rubyzip costs more
                  # time..
@@ -66,14 +59,14 @@ module Axlsx
           @options[:formula_value] = formula_values[c_index] if formula_values.is_a?(Array)
 
           data = [self, value, @options]
-          cell_to_xml_string(data, r_index, c_index, tmp)
+          cell_to_xml_string(cell, data, r_index, c_index, tmp)
         end
         str << tmp
       end
     end
 
-    def cell_to_xml_string(data, r_index, c_index, str = '')
-      CellWrapper.instance.to_xml_string(data, r_index, c_index, str)
+    def cell_to_xml_string(cell, data, r_index, c_index, str = '')
+      cell.to_xml_string(data, r_index, c_index, str)
     end
   end
 end
